@@ -1,4 +1,5 @@
 
+<x-app-layout>
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
@@ -22,13 +23,25 @@
     </head>
     <body class="bg-[#FDFDFC] dark:bg-[#0a0a0a] text-[#1b1b18] flex p-6 lg:p-8 items-center lg:justify-center min-h-screen flex-col">
 
-    <x-guest-layout>
         <div class="py-12">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                <h1>Bienvenue dans mon projet Laravel</h1>
+
+                <!--End Nav bar jetstream-->
+                <div>
+                    <h1>Bienvenue dans mon projet Laravel</h1>
+                    @if (session('ok'))
+                        <div class="bg-sky-100 border-l-4 border-sky-500 text-sky-700 p-4" role="alert">
+                            <p class="font-bold">Message</p>
+                            <p>{{ session('ok') }}</p>
+                        </div>
+                    @endif
+                </div>
+
             </div>
         </div>
-    </x-guest-layout>
+
+
 
     </body>
 </html>
+</x-app-layout>

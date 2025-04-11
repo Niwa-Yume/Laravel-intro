@@ -1,6 +1,6 @@
 <x-app-layout>
     <div class="mb-8">
-        <h1 class="text-2xl font-bold text-gray-900">{{ __('Create Film') }}</h1>
+        <h1 class="text-2xl font-bold text-gray-900">{{ __('Créer un film') }}</h1>
     </div>
 
     <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg p-6">

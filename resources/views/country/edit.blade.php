@@ -1,73 +1,72 @@
 <x-app-layout>
-<div>
     <div>
         <div>
-            <h2>
-                {{ __('Edit Pays') }}
-            </h2>
-        </div>
+            <div>
+                <h2>
+                    {{ __('Edit Pays') }}
+                </h2>
+            </div>
 
-        <div>
-            <form method="POST" action="{{ route('country.update', $country->id) }}">
-                {{ csrf_field() }}
-                {{ method_field('PUT') }}
+            <div>
+                <form method="POST" action="{{ route('country.update', $country->id) }}">
+                    {{ csrf_field() }}
+                    {{ method_field('PUT') }}
 
-                <div>
                     <div>
-                        <label for="name">
-                            {{ __('Name') }}
-                        </label>
-                        <input type="text"
-                               name="name"
-                               id="name"
-                               value="{{ $country->name }}"
-                               required />
+                        <div>
+                            <label for="name">
+                                {{ __('Name') }}
+                            </label>
+                            <input type="text"
+                                   name="name"
+                                   id="name"
+                                   value="{{ $country->name }}"
+                                   required />
+                        </div>
                     </div>
-                </div>
 
-                <div>
-                    <button type="submit">
-                        {{ __('Save Changes') }}
-                    </button>
-                </div>
-            </form>
+                    <div>
+                        <button type="submit">
+                            {{ __('Save Changes') }}
+                        </button>
+                    </div>
+                </form>
 
-            <form method="POST" action="{{ route('country.destroy', $country->id) }}" class="delete-form">
-                @csrf
-                @method('DELETE')
-                <button type="submit">{{ __('Delete') }}</button>
-            </form>
+                <form method="POST" action="{{ route('country.destroy', $country->id) }}" class="delete-form">
+                    @csrf
+                    @method('DELETE')
+                    <button type="button" class="delete-btn" data-id="{{ $country->id }}">{{ __('Delete') }}</button>
+                </form>
+            </div>
         </div>
     </div>
-</div>
 
-<script>
-    let token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-    document.addEventListener('DOMContentLoaded', function() {
-        document.querySelectorAll('.delete-btn').forEach(button => {
-            button.addEventListener('click', function() {
-                if (confirm('Are you sure you want to delete this item?')) {
-                    const id = this.dataset.id;
-                    const resourceType = window.location.pathname.split('/')[1]; // Gets 'artist', 'film', etc.
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.delete-btn').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    if (confirm('Are you sure you want to delete this item?')) {
+                        const id = this.dataset.id;
+                        const resourceType = window.location.pathname.split('/')[1];
 
-                    fetch(`/${resourceType}/${id}`, {
-                        method: 'DELETE',
-                        headers: {
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                            'Content-Type': 'application/json',
-                            'Accept': 'application/json',
-                        },
-                    })
-                        .then(response => {
-                            if (response.ok) {
-                                window.location.reload();
-                            } else {
-                                alert('Error deleting item');
-                            }
-                        });
-                }
+                        fetch(`/${resourceType}/${id}`, {
+                            method: 'DELETE',
+                            headers: {
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json',
+                            },
+                        })
+                            .then(response => {
+                                if (response.ok) {
+                                    window.location.href = `/${resourceType}`; // Redirect to index
+                                } else {
+                                    alert('Error deleting item');
+                                }
+                            });
+                    }
+                });
             });
         });
-    });
-</script>
+    </script>
 </x-app-layout>

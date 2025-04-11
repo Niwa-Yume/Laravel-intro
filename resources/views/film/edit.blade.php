@@ -62,15 +62,15 @@
                 </div>
             </form>
 
-            <form method="POST"
-                  action="{{ route('film.destroy', $film->id) }}"
-                  class="delete-form">
-                @csrf
-                @method('DELETE')
-                <button type="submit">
-                    {{ __('Delete') }}
-                </button>
-            </form>
+                        <form method="POST"
+                              action="{{ route('film.destroy', $film->id) }}"
+                              class="delete-form">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit">
+                                {{ __('Delete') }}
+                            </button>
+                        </form>
         </div>
     </div>
 </div>

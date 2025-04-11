@@ -16,7 +16,6 @@ class CountryController extends Controller
     {
         return view('country.index', [ 'countries' => Country::all()]);
     }
-
     /**
      * Show the form for creating a new resource.
      */
@@ -24,7 +23,6 @@ class CountryController extends Controller
     {
         return view('country.create');
     }
-
     /**
      * Store a newly created resource in storage.
      */
@@ -34,7 +32,6 @@ class CountryController extends Controller
         return redirect()->route('country.index')
             ->with('ok', __('Le pays a été enregistré'));
     }
-
     /**
      * Display the specified resource.
      */
@@ -51,8 +48,6 @@ class CountryController extends Controller
             'country' => $country,
         ]);
     }
-
-
     /**
      * Update the specified resource in storage.
      */

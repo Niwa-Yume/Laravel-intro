@@ -11,10 +11,10 @@
             <thead class="bg-gray-50">
             <tr>
                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    {{ __('Title') }}
+                    {{ __('Titre du film') }}
                 </th>
                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    {{ __('Year') }}
+                    {{ __('Année de sortie') }}
                 </th>
                 <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                     {{ __('Actions') }}
@@ -32,13 +32,13 @@
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <a href="{{ route('film.show', $film->id) }}" class="text-blue-600 hover:text-blue-900 mr-3">
-                            {{ __('View') }}
+                            {{ __('Voir') }}
                         </a>
                         <a href="{{ route('film.edit', $film->id) }}" class="text-indigo-600 hover:text-indigo-900 mr-3">
-                            {{ __('Edit') }}
+                            {{ __('Modifier') }}
                         </a>
                         <button class="text-red-600 hover:text-red-900 delete-btn" data-id="{{ $film->id }}">
-                            {{ __('Delete') }}
+                            {{ __('Supprimer') }}
                         </button>
                     </td>
                 </tr>

@@ -90,7 +90,7 @@
                     })
                         .then(response => {
                             if (response.ok) {
-                                window.location.reload();
+                                window.location = '/artist';
                             } else {
                                 alert('Error deleting item');
                             }

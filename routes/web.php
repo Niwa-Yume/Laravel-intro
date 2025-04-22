@@ -7,7 +7,7 @@ use App\Http\Controllers\CountryController;
 
 Route::get('/', function () {
     return view('welcome');
-})->middleware('auth');
+})->middleware('auth')->name('welcome');
 
 Route::middleware([
     'auth:sanctum',

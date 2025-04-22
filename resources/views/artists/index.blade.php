@@ -36,11 +36,8 @@
                             {{ __('Voir') }}
                         </a>
                         <a href="{{ route('artist.edit', $artist->id) }}" class="text-indigo-600 hover:text-indigo-900 mr-3">
-                            {{ __('Modifier') }}
+                            {{ __('Modifier ou supprimer') }}
                         </a>
-                        <button class="text-red-600 hover:text-red-900 delete-btn" data-id="{{ $artist->id }}">
-                            {{ __('Supprimer') }}
-                        </button>
                     </td>
                 </tr>
             @endforeach

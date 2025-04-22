@@ -1,46 +1,48 @@
 <x-app-layout>
-<div>
-    <div>
-        <div>
-            <h2>
-                {{ __('Edit Artist') }}
-            </h2>
-        </div>
+    <x-navigation-bar />
 
-        <div>
-            <form method="POST" action="{{ route('artist.update', $artist->id) }}">
-                {{ csrf_field() }}
-                {{ method_field('PUT') }}
+    <div class="sm:flex sm:items-center sm:justify-between mb-8">
+        <h1 class="text-2xl font-bold text-gray-900">{{ __('Modifier un artiste') }}</h1>
+    </div>
 
-                <div>
+    <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
+        <div class="p-6">
+            <form method="POST" action="{{ route('artist.update', $artist->id) }}" class="space-y-6">
+                @csrf
+                @method('PUT')
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                        <label for="name">
-                            {{ __('Name') }}
+                        <label for="name" class="block text-sm font-medium text-gray-700">
+                            {{ __('Nom') }}
                         </label>
                         <input type="text"
                                name="name"
                                id="name"
                                value="{{ $artist->name }}"
+                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                                required />
                     </div>
 
                     <div>
-                        <label for="firstname">
-                            {{ __('Firstname') }}
+                        <label for="firstname" class="block text-sm font-medium text-gray-700">
+                            {{ __('Prénom') }}
                         </label>
                         <input type="text"
                                name="firstname"
                                id="firstname"
                                value="{{ $artist->firstname }}"
+                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                                required />
                     </div>
 
                     <div>
-                        <label for="country_id">
-                            {{ __('Country') }}
+                        <label for="country_id" class="block text-sm font-medium text-gray-700">
+                            {{ __('Pays') }}
                         </label>
                         <select name="country_id"
                                 id="country_id"
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                                 required>
                             @foreach($countries as $country)
                                 <option value="{{ $country->id }}" {{ $country->id == $artist->country_id ? 'selected="selected"' : '' }}>
@@ -51,53 +53,18 @@
                     </div>
                 </div>
 
-                <div>
-                    <button type="submit">
-                        {{ __('Save Changes') }}
+                <div class="flex justify-end space-x-4">
+                    <button type="submit" class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                        {{ __('Enregistrer les modifications') }}
+                    </button>
+
+                    <button type="button"
+                            class="delete-btn inline-flex items-center px-4 py-2 bg-red-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                            data-id="{{ $artist->id }}">
+                        {{ __('Supprimer') }}
                     </button>
                 </div>
             </form>
-
-            <form method="POST"
-                  action="{{ route('artist.destroy', $artist->id) }}"
-                  class="delete-form">
-                @csrf
-                @method('DELETE')
-                <button type="submit">
-                    {{ __('Delete') }}
-                </button>
-            </form>
         </div>
     </div>
-</div>
-
-<script>
-    let token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-    document.addEventListener('DOMContentLoaded', function() {
-        document.querySelectorAll('.delete-btn').forEach(button => {
-            button.addEventListener('click', function() {
-                if (confirm('Are you sure you want to delete this item?')) {
-                    const id = this.dataset.id;
-                    const resourceType = window.location.pathname.split('/')[1]; // Gets 'artist', 'film', etc.
-
-                    fetch(`/${resourceType}/${id}`, {
-                        method: 'DELETE',
-                        headers: {
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                            'Content-Type': 'application/json',
-                            'Accept': 'application/json',
-                        },
-                    })
-                        .then(response => {
-                            if (response.ok) {
-                                window.location = '/artist';
-                            } else {
-                                alert('Error deleting item');
-                            }
-                        });
-                }
-            });
-        });
-    });
-</script>
 </x-app-layout>

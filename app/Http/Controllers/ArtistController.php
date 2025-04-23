@@ -7,6 +7,7 @@ use App\Models\Artist;
 use App\Models\Country;
 use App\Models\Label;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class ArtistController extends Controller
 {
@@ -86,7 +87,11 @@ class ArtistController extends Controller
      */
     public function edit(Artist $artist)
     {
-        return view('artists.edit', ['artist' => $artist, 'countries' => Country::all()]);
+        return view('artists.edit', [
+            'artist' => $artist,
+            'countries' => Country::all(),
+            'movies' => Movie::all()
+        ]);
     }
 
     /**
@@ -99,11 +104,13 @@ class ArtistController extends Controller
             'firstname' => 'required|string|max:255',
             'country_id' => 'required|exists:countries,id',
             'description' => 'nullable|string',
-            'image' => 'nullable|image|max:2048'
+            'image' => 'nullable|image|max:2048',
+            'movies' => 'nullable|array',
+            'movies.*.movie_id' => 'required|exists:movies,id',
+            'movies.*.role_name' => 'required|string|max:255'
         ]);
 
         if ($request->hasFile('image')) {
-            // Supprimer l'ancienne image si elle existe
             if ($artist->image_path) {
                 Storage::disk('public')->delete($artist->image_path);
             }
@@ -111,7 +118,23 @@ class ArtistController extends Controller
             $validatedData['image_path'] = $path;
         }
 
-        $artist->update($validatedData);
+        $artist->update([
+            'name' => $validatedData['name'],
+            'firstname' => $validatedData['firstname'],
+            'country_id' => $validatedData['country_id'],
+            'description' => $validatedData['description'],
+            'image_path' => $validatedData['image_path'] ?? $artist->image_path
+        ]);
+
+        // Mise à jour des films
+        $artist->movies()->detach();
+        if (isset($validatedData['movies'])) {
+            foreach ($validatedData['movies'] as $movie) {
+                $artist->movies()->attach($movie['movie_id'], [
+                    'role_name' => $movie['role_name']
+                ]);
+            }
+        }
 
         return redirect()->route('artist.index')
             ->with('success', 'Artiste modifié avec succès');
@@ -119,11 +142,43 @@ class ArtistController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Artist $artist)
+    public function destroy(Artist $artist, Request $request)
     {
-        $artist->delete();
-        return response()->json();
+        try {
+            // Vérifiez d'abord les relations
+            if ($artist->directedMovies()->count() > 0) {
+                if ($request->wantsJson()) {
+                    return response()->json(['error' => 'Impossible de supprimer cet artiste car il est lié à des films en tant que réalisateur.'], 422);
+                }
+                return redirect()->back()->with('error', 'Impossible de supprimer cet artiste car il est lié à des films en tant que réalisateur.');
+            }
+
+            if ($artist->image_path) {
+                Storage::disk('public')->delete($artist->image_path);
+            }
+
+            // Détachez d'abord les films
+            $artist->movies()->detach();
+
+            // Puis supprimez l'artiste
+            $artist->delete();
+
+            if ($request->wantsJson()) {
+                return response()->json(['message' => 'Artist deleted successfully']);
+            }
+
+            return redirect()->route('artist.index')->with('success', 'Artiste supprimé avec succès');
+        } catch (\Exception $e) {
+            \Log::error('Erreur de suppression d\'artiste: ' . $e->getMessage());
+
+            if ($request->wantsJson()) {
+                return response()->json(['error' => $e->getMessage()], 500);
+            }
+
+            return redirect()->back()->with('error', 'Une erreur est survenue lors de la suppression de l\'artiste.');
+        }
     }
+
 
     public function addMovie(Artist $artist)
     {

@@ -1,46 +1,89 @@
 <x-app-layout>
-    <div class="mb-8">
-        <h1 class="text-2xl font-bold text-gray-900">{{ __('Create Artist') }}</h1>
+    <x-navigation-bar />
+
+    <div class="sm:flex sm:items-center sm:justify-between mb-8">
+        <h1 class="text-2xl font-bold text-gray-900">{{ __('Ajouter un artiste') }}</h1>
     </div>
 
-    <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg p-6">
-        <form method="POST" action="{{ route('artist.store') }}" class="space-y-6">
-            @csrf
+    <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
+        <div class="p-6">
+            <form method="POST"
+                  action="{{ route('artist.store') }}"
+                  enctype="multipart/form-data"
+                  class="space-y-6">
+                @csrf
 
-            <div>
-                <x-label for="name" value="{{ __('nom de l\'acteur') }}" />
-                <x-input id="name" name="name" type="text" class="mt-1 block w-full" required />
-                <x-input-error for="name" class="mt-2" />
-            </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="name" class="block text-sm font-medium text-gray-700">
+                            {{ __('Nom') }}
+                        </label>
+                        <input type="text"
+                               name="name"
+                               id="name"
+                               value="{{ old('name') }}"
+                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                               required />
+                    </div>
 
-            <div>
-                <x-label for="firstname" value="{{ __('Prenom') }}" />
-                <x-input id="firstname" name="firstname" type="text" class="mt-1 block w-full" required />
-                <x-input-error for="firstname" class="mt-2" />
-            </div>
+                    <div>
+                        <label for="firstname" class="block text-sm font-medium text-gray-700">
+                            {{ __('Prénom') }}
+                        </label>
+                        <input type="text"
+                               name="firstname"
+                               id="firstname"
+                               value="{{ old('firstname') }}"
+                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                               required />
+                    </div>
 
-            <div>
-                <x-label for="birthyear" value="{{ __('Année de naissance') }}" />
-                <x-input id="birthyear" name="birthyear" type="number" min="1900" max="{{ date('Y') }}" class="mt-1 block w-full" required />
-                <x-input-error for="birthyear" class="mt-2" />
-            </div>
+                    <div>
+                        <label for="country_id" class="block text-sm font-medium text-gray-700">
+                            {{ __('Pays') }}
+                        </label>
+                        <select name="country_id"
+                                id="country_id"
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                required>
+                            <option value="">{{ __('Sélectionnez un pays') }}</option>
+                            @foreach($countries as $country)
+                                <option value="{{ $country->id }}" {{ old('country_id') == $country->id ? 'selected' : '' }}>
+                                    {{ $country->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
 
-            <div>
-                <x-label for="country_id" value="{{ __('Pays de naissance') }}" />
-                <select id="country_id" name="country_id" class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
-                    <option value="">{{ __('Choisir un pays') }}</option>
-                    @foreach(App\Models\Country::all() as $country)
-                        <option value="{{ $country->id }}">{{ $country->name }}</option>
-                    @endforeach
-                </select>
-                <x-input-error for="country_id" class="mt-2" />
-            </div>
+                    <div class="col-span-2">
+                        <label for="description" class="block text-sm font-medium text-gray-700">
+                            {{ __('Filmographie/Bio') }}
+                        </label>
+                        <textarea
+                            name="description"
+                            id="description"
+                            rows="4"
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">{{ old('description') }}</textarea>
+                    </div>
 
-            <div class="flex items-center justify-end">
-                <x-button>
-                    {{ __('Créer') }}
-                </x-button>
-            </div>
-        </form>
+                    <div class="col-span-2">
+                        <label for="image" class="block text-sm font-medium text-gray-700">
+                            {{ __('Image') }}
+                        </label>
+                        <input type="file"
+                               name="image"
+                               id="image"
+                               class="mt-1 block w-full"
+                               accept="image/*">
+                    </div>
+                </div>
+
+                <div class="flex justify-end">
+                    <button type="submit" class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                        {{ __('Ajouter') }}
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
 </x-app-layout>

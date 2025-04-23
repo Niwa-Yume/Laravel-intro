@@ -10,7 +10,11 @@ class Artist extends Model
     use HasFactory;
     //use SoftDeletes;
     protected $fillable = [
-        'name', 'firstname', 'birthdate','country_id'
+        'name',
+        'firstname',
+        'country_id',
+        'description',
+        'image_path'
     ];
     public function country()
     {
@@ -23,6 +27,10 @@ class Artist extends Model
     public function hasPlayed()
     {
         return $this->belongsToMany(Movie::class)->withPivot('role_name');
+    }
+    public function films()
+    {
+        return $this->belongsToMany(Film::class, 'artist_film');
     }
 
 }

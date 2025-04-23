@@ -24,7 +24,9 @@ class ArtistController extends Controller
      */
     public function create()
     {
-        return view('artists.create');
+        return view('artists.create', [
+            'countries' => Country::all()
+        ]);
     }
 
 
@@ -39,11 +41,25 @@ class ArtistController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(ArtistRequest $request)
+    public function store(Request $request)
     {
-        Artist::create($request->validated());
+        $validatedData = $request->validate([
+            'name' => 'required|string|max:255',
+            'firstname' => 'required|string|max:255',
+            'country_id' => 'required|exists:countries,id',
+            'description' => 'nullable|string',
+            'image' => 'nullable|image|max:2048'
+        ]);
+
+        if ($request->hasFile('image')) {
+            $path = $request->file('image')->store('artists', 'public');
+            $validatedData['image_path'] = $path;
+        }
+
+        Artist::create($validatedData);
+
         return redirect()->route('artist.index')
-            ->with('ok', __('Artist has been saved'));
+            ->with('success', 'Artiste créé avec succès');
     }
 
     /**
@@ -57,14 +73,30 @@ class ArtistController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(ArtistRequest $request, Artist $artist)
+    public function update(Request $request, Artist $artist)
     {
-        $artist->update( $request->validated() );
+        $validatedData = $request->validate([
+            'name' => 'required|string|max:255',
+            'firstname' => 'required|string|max:255',
+            'country_id' => 'required|exists:countries,id',
+            'description' => 'nullable|string',
+            'image' => 'nullable|image|max:2048'
+        ]);
+
+        if ($request->hasFile('image')) {
+            // Supprimer l'ancienne image si elle existe
+            if ($artist->image_path) {
+                Storage::disk('public')->delete($artist->image_path);
+            }
+            $path = $request->file('image')->store('artists', 'public');
+            $validatedData['image_path'] = $path;
+        }
+
+        $artist->update($validatedData);
 
         return redirect()->route('artist.index')
-            ->with( 'ok', __('Artist has been updated') );
+            ->with('success', 'Artiste modifié avec succès');
     }
-
     /**
      * Remove the specified resource from storage.
      */

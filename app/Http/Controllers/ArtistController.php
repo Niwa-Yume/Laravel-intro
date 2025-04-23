@@ -26,7 +26,8 @@ class ArtistController extends Controller
     public function create()
     {
         return view('artists.create', [
-            'countries' => Country::all()
+            'countries' => Country::all(),
+            'movies' => Movie::all()
         ]);
     }
 
@@ -49,7 +50,10 @@ class ArtistController extends Controller
             'firstname' => 'required|string|max:255',
             'country_id' => 'required|exists:countries,id',
             'description' => 'nullable|string',
-            'image' => 'nullable|image|max:2048'
+            'image' => 'nullable|image|max:2048',
+            'movies' => 'nullable|array',
+            'movies.*.movie_id' => 'required|exists:movies,id',
+            'movies.*.role_name' => 'required|string|max:255'
         ]);
 
         if ($request->hasFile('image')) {
@@ -57,7 +61,21 @@ class ArtistController extends Controller
             $validatedData['image_path'] = $path;
         }
 
-        Artist::create($validatedData);
+        $artist = Artist::create([
+            'name' => $validatedData['name'],
+            'firstname' => $validatedData['firstname'],
+            'country_id' => $validatedData['country_id'],
+            'description' => $validatedData['description'],
+            'image_path' => $validatedData['image_path'] ?? null
+        ]);
+
+        if (isset($validatedData['movies'])) {
+            foreach ($validatedData['movies'] as $movie) {
+                $artist->movies()->attach($movie['movie_id'], [
+                    'role_name' => $movie['role_name']
+                ]);
+            }
+        }
 
         return redirect()->route('artist.index')
             ->with('success', 'Artiste créé avec succès');

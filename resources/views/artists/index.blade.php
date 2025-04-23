@@ -33,7 +33,7 @@
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <a href="{{ route('artist.show', $artist->id) }}" class="text-blue-600 hover:text-blue-900 mr-3">
-                            {{ __('Voir') }}
+                            {{ __('Voir en détail') }}
                         </a>
                         <a href="{{ route('artist.edit', $artist->id) }}" class="text-indigo-600 hover:text-indigo-900 mr-3">
                             {{ __('Modifier ou supprimer') }}

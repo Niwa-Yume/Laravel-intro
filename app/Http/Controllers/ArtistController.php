@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 use App\Http\Requests\ArtistRequest;
+use App\Models\Movie;
 use App\Models\Artist;
 use App\Models\Country;
 use App\Models\Label;
@@ -104,5 +105,30 @@ class ArtistController extends Controller
     {
         $artist->delete();
         return response()->json();
+    }
+
+    public function addMovie(Artist $artist)
+    {
+        return view('artists.add-movie', [
+            'artist' => $artist,
+            'movies' => Movie::whereDoesntHave('actors', function ($query) use ($artist) {
+                $query->where('artist_id', $artist->id);
+            })->get()
+        ]);
+    }
+
+    public function storeMovie(Request $request, Artist $artist)
+    {
+        $validatedData = $request->validate([
+            'movie_id' => 'required|exists:movies,id',
+            'role_name' => 'required|string|max:255'
+        ]);
+
+        $artist->movies()->attach($validatedData['movie_id'], [
+            'role_name' => $validatedData['role_name']
+        ]);
+
+        return redirect()->route('artist.show', $artist)
+            ->with('success', 'Film ajouté avec succès');
     }
 }

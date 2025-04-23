@@ -23,6 +23,10 @@ Route::resource('artist', ArtistController::class);
 Route::delete('artist/{artist}', [ArtistController::class, 'destroy'])
     ->middleware('ajax')
     ->name('artist.destroy');
+Route::get('artist/{artist}/add-movie', [ArtistController::class, 'addMovie'])
+    ->name('artist.add-movie');
+Route::post('artist/{artist}/add-movie', [ArtistController::class, 'storeMovie'])
+    ->name('artist.store-movie');
 
 Route::resource('film', FilmController::class);
 Route::resource('country', CountryController::class);

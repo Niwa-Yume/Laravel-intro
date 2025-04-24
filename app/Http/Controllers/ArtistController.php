@@ -9,6 +9,7 @@ use App\Models\Label;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
+
 class ArtistController extends Controller
 {
     /**
@@ -46,40 +47,94 @@ class ArtistController extends Controller
      */
     public function store(Request $request)
     {
-        $validatedData = $request->validate([
-            'name' => 'required|string|max:255',
-            'firstname' => 'required|string|max:255',
-            'country_id' => 'required|exists:countries,id',
-            'description' => 'nullable|string',
-            'image' => 'nullable|image|max:2048',
-            'movies' => 'nullable|array',
-            'movies.*.movie_id' => 'required|exists:movies,id',
-            'movies.*.role_name' => 'required|string|max:255'
-        ]);
+        try {
+            $validatedData = $request->validate([
+                'name' => 'required|string|max:255',
+                'firstname' => 'required|string|max:255',
+                'country_id' => 'required|exists:countries,id',
+                'description' => 'nullable|string',
+                'image' => 'nullable|string|url',
+                'movies' => 'nullable|array',
+                'movies.*.movie_id' => 'required|exists:movies,id',
+                'movies.*.role_name' => 'required|string|max:255'
+            ]);
 
-        if ($request->hasFile('image')) {
-            $path = $request->file('image')->store('artists', 'public');
-            $validatedData['image_path'] = $path;
-        }
+            if ($request->has('image')) {
+                try {
+                    $imageUrl = $request->input('image');
 
-        $artist = Artist::create([
-            'name' => $validatedData['name'],
-            'firstname' => $validatedData['firstname'],
-            'country_id' => $validatedData['country_id'],
-            'description' => $validatedData['description'],
-            'image_path' => $validatedData['image_path'] ?? null
-        ]);
+                    $context = stream_context_create([
+                        'http' => [
+                            'method' => 'GET',
+                            'header' => [
+                                'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+                            ]
+                        ]
+                    ]);
 
-        if (isset($validatedData['movies'])) {
-            foreach ($validatedData['movies'] as $movie) {
-                $artist->movies()->attach($movie['movie_id'], [
-                    'role_name' => $movie['role_name']
-                ]);
+                    $imageContents = @file_get_contents($imageUrl, false, $context);
+
+                    if ($imageContents === false) {
+                        throw new \Exception("Impossible de télécharger l'image depuis : " . $imageUrl);
+                    }
+
+                    if (!$this->isImage($imageContents)) {
+                        throw new \Exception("Le fichier téléchargé n'est pas une image valide");
+                    }
+
+                    $filename = 'artists/' . time() . '_' . uniqid() . '.jpg';
+                    $saved = Storage::disk('public')->put($filename, $imageContents);
+
+                    if (!$saved) {
+                        throw new \Exception("Échec de la sauvegarde de l'image");
+                    }
+
+                    \Log::info('Image sauvegardée dans : ' . $filename);
+                    $validatedData['image_path'] = $filename;
+
+                } catch (\Exception $e) {
+                    \Log::error('URL de l\'image : ' . $imageUrl);
+                    \Log::error('Chemin de sauvegarde : ' . storage_path('app/public/artists'));
+                    \Log::error('Erreur complète : ' . $e->getMessage());
+                    throw new \Exception("Erreur lors du traitement de l'image : " . $e->getMessage());
+                }
             }
-        }
 
-        return redirect()->route('artist.index')
-            ->with('success', 'Artiste créé avec succès');
+            $artist = Artist::create([
+                'name' => $validatedData['name'],
+                'firstname' => $validatedData['firstname'],
+                'country_id' => $validatedData['country_id'],
+                'description' => $validatedData['description'],
+                'image_path' => $validatedData['image_path'] ?? null
+            ]);
+
+            if (isset($validatedData['movies'])) {
+                foreach ($validatedData['movies'] as $movie) {
+                    $artist->movies()->attach($movie['movie_id'], [
+                        'role_name' => $movie['role_name']
+                    ]);
+                }
+            }
+
+            return redirect()->route('artist.index')
+                ->with('success', 'Artiste créé avec succès');
+
+        } catch (\Exception $e) {
+            \Log::error('Erreur lors de la création de l\'artiste : ' . $e->getMessage());
+            return redirect()->back()
+                ->withInput()
+                ->with('error', "Une erreur est survenue : " . $e->getMessage());
+        }
+    }
+
+    /**
+     * Vérifie si le contenu est une image valide
+     */
+    private function isImage($content)
+    {
+        $finfo = new \finfo(FILEINFO_MIME_TYPE);
+        $mimeType = $finfo->buffer($content);
+        return strpos($mimeType, 'image/') === 0;
     }
 
     /**

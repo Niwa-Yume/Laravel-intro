@@ -17,9 +17,7 @@ class ArtistController extends Controller
      */
     public function index()
     {
-        //permet de faire du debuggin
-        // return dd($artists = Artist::all());
-        return view('artists.index', [ 'artists' => Artist::all() ]);
+        return view('artists.index', ['artists' => Artist::with('movies')->get()]);
     }
 
     /**

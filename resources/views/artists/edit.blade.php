@@ -84,38 +84,37 @@
                         @endif
                     </div>
 
-                    <!-- Section Films -->
-                    <div class="col-span-2">
-                        <h3 class="text-lg font-medium text-gray-900 mb-4">{{ __('Films') }}</h3>
-                        <div id="movies-container" class="space-y-4">
-                            @foreach($artist->movies as $index => $artistMovie)
-                                <div class="movie-entry grid grid-cols-2 gap-4 p-4 border rounded-lg relative">
-                                    <button type="button" class="delete-movie absolute -top-2 -right-2 p-1 bg-white rounded-full text-red-600 hover:text-red-800 shadow-sm border border-gray-200">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                                        </svg>
-                                    </button>
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700">{{ __('Film') }}</label>
-                                        <select name="movies[{{ $index }}][movie_id]" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                                            <option value="">{{ __('Sélectionnez un film') }}</option>
-                                            @foreach($movies as $movie)
-                                                <option value="{{ $movie->id }}" {{ $artistMovie->id == $movie->id ? 'selected' : '' }}>
-                                                    {{ $movie->title }} ({{ $movie->year }})
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700">{{ __('Rôle') }}</label>
-                                        <input type="text"
-                                               name="movies[{{ $index }}][role_name]"
-                                               value="{{ $artistMovie->pivot->role_name }}"
-                                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                                    </div>
-                                </div>
-                            @endforeach
-                        </div>
+   <div class="col-span-2">
+    <h3 class="text-lg font-medium text-gray-900 mb-4">{{ __('Films') }}</h3>
+    <div id="movies-container" class="space-y-4">
+        @foreach($artist->movies as $index => $artistMovie)
+            <div class="movie-entry grid grid-cols-[1fr_1fr_auto] gap-4 p-4 border rounded-lg">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">{{ __('Film') }}</label>
+                    <select name="movies[{{ $index }}][movie_id]" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                        <option value="">{{ __('Sélectionnez un film') }}</option>
+                        @foreach($movies as $movie)
+                            <!-- Options -->
+                        @endforeach
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">{{ __('Rôle') }}</label>
+                    <input type="text"
+                           name="movies[{{ $index }}][role_name]"
+                           value="{{ $artistMovie->pivot->role_name }}"
+                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                </div>
+                <div class="flex items-center justify-end">
+                    <button type="button" class="delete-movie p-1 bg-white rounded-full text-red-600 hover:text-red-800 shadow-sm border border-gray-200">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        @endforeach
+    </div>
                         <button type="button" id="add-movie" class="mt-4 inline-flex items-center px-4 py-2 bg-indigo-100 text-indigo-700 text-sm font-medium rounded-lg hover:bg-indigo-200">
                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>

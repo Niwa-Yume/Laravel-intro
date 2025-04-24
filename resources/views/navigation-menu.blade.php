@@ -4,13 +4,8 @@
             <!-- Logo à gauche -->
             <div class="flex items-center">
                 <a href="{{ route('welcome') }}" class="flex items-center">
-                    <!-- Logo SVG -->
-                    <svg class="h-8 w-8 text-indigo-600" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
-                    </svg>
-                </a>
+                    <img src="{{ asset('images/Logo-Cine-verse.png') }}" alt="Test logo" class="w-20 h-20" style="width: 60px; height: 60px;">                </a>
             </div>
-
             <!-- Menu utilisateur à droite -->
             @auth
                 <div class="flex items-center">

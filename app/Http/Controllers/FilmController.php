@@ -37,17 +37,19 @@ class FilmController extends Controller
         // Ajouter le directeur avec son rôle
         $film->actors()->attach($request->director_id, ['role_name' => 'Directeur']);
 
-        // Ajouter les autres acteurs avec un rôle par défaut
-        if ($request->has('actors')) {
-            $actorsWithRole = collect($request->actors)->mapWithKeys(function ($actorId) {
-                return [$actorId => ['role_name' => 'Acteur']];
-            })->toArray();
-
-            $film->actors()->attach($actorsWithRole);
+        // Ajouter le casting
+        if ($request->has('casting')) {
+            foreach ($request->casting as $castMember) {
+                if (!empty($castMember['actor_id'])) {
+                    $film->actors()->attach($castMember['actor_id'], [
+                        'role_name' => 'Acteur'
+                    ]);
+                }
+            }
         }
 
         return redirect()->route('film.index')
-            ->with('success', __('Le film a été enregistré'));
+            ->with('success', __('Le film a été créé'));
     }
 
     /**
@@ -76,8 +78,25 @@ class FilmController extends Controller
     {
         $film->update($request->validated());
 
+        // Supprimer tous les acteurs existants
+        $film->actors()->detach();
+
+        // Ajouter le directeur avec son rôle
+        $film->actors()->attach($request->director_id, ['role_name' => 'Directeur']);
+
+        // Ajouter ou mettre à jour le casting
+        if ($request->has('casting')) {
+            foreach ($request->casting as $castMember) {
+                if (!empty($castMember['actor_id'])) {
+                    $film->actors()->attach($castMember['actor_id'], [
+                        'role_name' => 'Acteur'
+                    ]);
+                }
+            }
+        }
+
         return redirect()->route('film.index')
-            ->with('ok', __('Le film a été modifié'));
+            ->with('success', __('Le film a été modifié'));
     }
 
     /**

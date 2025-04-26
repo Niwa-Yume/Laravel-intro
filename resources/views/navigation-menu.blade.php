@@ -4,7 +4,7 @@
             <!-- Logo à gauche -->
             <div class="flex items-center">
                 <a href="{{ route('welcome') }}" class="flex items-center">
-                    <img src="{{ asset('images/Logo-Cine-verse.png') }}" alt="Test logo" class="w-20 h-20" style="width: 60px; height: 60px;">                </a>
+                    <img src="{{ asset('images/icon.svg') }}" alt="Test logo" class="w-20 h-20" style="width: 60px; height: 60px;">                </a>
             </div>
             <!-- Menu utilisateur à droite -->
             @auth

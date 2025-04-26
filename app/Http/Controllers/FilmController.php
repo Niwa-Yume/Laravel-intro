@@ -14,7 +14,9 @@ class FilmController extends Controller
      */
     public function index()
     {
-        return view('film.index', [ 'films' => Movie::all()]);
+        return view('film.index', [
+            'films' => Movie::with(['actors', 'country'])->get()
+        ]);
     }
 
     /**
@@ -30,9 +32,22 @@ class FilmController extends Controller
      */
     public function store(FilmRequest $request)
     {
-        Movie::create($request->validated());
+        $film = Movie::create($request->validated());
+
+        // Ajouter le directeur avec son rôle
+        $film->actors()->attach($request->director_id, ['role_name' => 'Directeur']);
+
+        // Ajouter les autres acteurs avec un rôle par défaut
+        if ($request->has('actors')) {
+            $actorsWithRole = collect($request->actors)->mapWithKeys(function ($actorId) {
+                return [$actorId => ['role_name' => 'Acteur']];
+            })->toArray();
+
+            $film->actors()->attach($actorsWithRole);
+        }
+
         return redirect()->route('film.index')
-            ->with('ok', __('Le film a été enregistré'));
+            ->with('success', __('Le film a été enregistré'));
     }
 
     /**

@@ -16,15 +16,16 @@ class FilmRequest extends FormRequest
 
     /**
      * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             'title' => 'required|string|max:50',
             'year' => 'required|numeric|digits:4',
-            'country_id' => 'required|exists:countries,id'
+            'director_id' => 'required|exists:artists,id',
+            'country_id' => 'required|exists:countries,id',
+            'actors' => 'sometimes|array',
+            'actors.*' => 'exists:artists,id'
         ];
     }
 }

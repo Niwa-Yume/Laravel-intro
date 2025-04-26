@@ -9,6 +9,8 @@ Route::get('/', function () {
     return view('welcome');
 })->middleware('auth')->name('welcome');
 
+
+// Route middleware pour les utilisateurs authentifiés et le rest c'est les routes publiques qui n'ont pas besoin d'authentification
 Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),
@@ -18,25 +20,30 @@ Route::middleware([
         return view('dashboard');
     })->name('dashboard');
 
-    // Suppression de la route pour Artist
+    // Routes pour Artist
     Route::resource('artist', ArtistController::class)->except(['destroy']);
     Route::delete('artist/{artist}', [ArtistController::class, 'destroy'])
         ->name('artist.destroy')
         ->middleware('auth');
 
-    //Suppression de la route pour Country
+    // Routes pour Country
     Route::resource('country', CountryController::class);
     Route::delete('country/{country}', [CountryController::class, 'destroy'])
         ->middleware('ajax')
         ->name('country.destroy');
+
+    // Routes pour Film
+    Route::resource('film', FilmController::class);
+
+    // Routes pour ajouter un film à un artiste
+    Route::get('artist/{artist}/add-movie', [ArtistController::class, 'addMovie'])
+        ->name('artist.add-movie');
+    Route::post('artist/{artist}/add-movie', [ArtistController::class, 'storeMovie'])
+        ->name('artist.store-movie');
+
+
 });
 
 
 
-Route::get('artist/{artist}/add-movie', [ArtistController::class, 'addMovie'])
-    ->name('artist.add-movie');
-Route::post('artist/{artist}/add-movie', [ArtistController::class, 'storeMovie'])
-    ->name('artist.store-movie');
-
-Route::resource('film', FilmController::class);
 

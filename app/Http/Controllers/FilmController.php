@@ -104,7 +104,13 @@ class FilmController extends Controller
      */
     public function destroy(Movie $film)
     {
+        // Détacher d'abord toutes les relations avec les artistes
+        $film->actors()->detach();
+
+        // Puis supprimer le film
         $film->delete();
-        return response()->json();
+
+        return redirect()->route('film.index')
+            ->with('success', __('Le film a été supprimé'));
     }
 }

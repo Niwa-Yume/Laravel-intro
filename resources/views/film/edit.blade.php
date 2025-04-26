@@ -173,6 +173,7 @@
             });
 
             // Gestion de la suppression du film
+            // Gestion de la suppression du film
             document.addEventListener('DOMContentLoaded', function() {
                 const deleteBtn = document.querySelector('.delete-btn');
                 if (deleteBtn) {
@@ -183,7 +184,6 @@
                             const form = document.createElement('form');
                             form.method = 'POST';
                             form.action = `/film/${id}`;
-                            form.style.display = 'none';
 
                             const methodInput = document.createElement('input');
                             methodInput.type = 'hidden';
@@ -199,10 +199,7 @@
                             form.appendChild(tokenInput);
                             document.body.appendChild(form);
 
-                            form.addEventListener('submit', function() {
-                                window.location.href = '{{ route("film.index") }}';
-                            });
-                            form.submit();
+                            form.submit(); // Supprimer l'event listener et soumettre directement
                         }
                     });
                 }

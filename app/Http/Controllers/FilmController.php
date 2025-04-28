@@ -41,7 +41,8 @@ class FilmController extends Controller
             $film->save();
         }
         $film = Movie::create($request->validated());
-
+        $film->update($request->validated());
+        $film->actors()->attach($request->director_id, ['role_name' => 'Directeur']);
         // Ajouter le directeur avec son rôle
         $film->actors()->attach($request->director_id, ['role_name' => 'Directeur']);
 
@@ -89,7 +90,7 @@ class FilmController extends Controller
         // Supprimer tous les acteurs existants
         $film->actors()->detach();
 
-        // Ajouter le directeur avec son rôle
+        $film->update($request->validated());
         $film->actors()->attach($request->director_id, ['role_name' => 'Directeur']);
 
         // Ajouter ou mettre à jour le casting

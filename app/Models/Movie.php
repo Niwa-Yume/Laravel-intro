@@ -20,6 +20,13 @@ class Movie extends Model
     public function actors()
     {
         return $this->belongsToMany(Artist::class, 'artist_movie', 'movie_id', 'artist_id')
+            ->wherePivot('role_name', '!=', 'Directeur')
+            ->withPivot('role_name');
+    }
+
+    public function allArtists()
+    {
+        return $this->belongsToMany(Artist::class, 'artist_movie', 'movie_id', 'artist_id')
             ->withPivot('role_name');
     }
 

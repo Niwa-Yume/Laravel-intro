@@ -34,6 +34,7 @@ Route::middleware([
 
     // Routes pour Film
     Route::resource('film', FilmController::class);
+    Route::delete('film/{film}', [FilmController::class, 'destroy'])->name('film.destroy');
 
     // Routes pour ajouter un film à un artiste
     Route::get('artist/{artist}/add-movie', [ArtistController::class, 'addMovie'])

@@ -6,6 +6,9 @@ use App\Models\Movie;
 use App\Models\Artist;
 use App\Models\Country;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+
 
 class FilmController extends Controller
 {
@@ -32,6 +35,11 @@ class FilmController extends Controller
      */
     public function store(FilmRequest $request)
     {
+        if ($request->hasFile('image')) {
+            $path = $request->file('image')->store('films', 'public');
+            $film->image_path = $path;
+            $film->save();
+        }
         $film = Movie::create($request->validated());
 
         // Ajouter le directeur avec son rôle
@@ -94,7 +102,11 @@ class FilmController extends Controller
                 }
             }
         }
-
+        if ($request->hasFile('image')) {
+            $path = $request->file('image')->store('films', 'public');
+            $film->image_path = $path;
+            $film->save();
+        }
         return redirect()->route('film.index')
             ->with('success', __('Le film a été modifié'));
     }
@@ -104,13 +116,27 @@ class FilmController extends Controller
      */
     public function destroy(Movie $film)
     {
-        // Détacher d'abord toutes les relations avec les artistes
-        $film->actors()->detach();
+        try {
+            DB::beginTransaction();
 
-        // Puis supprimer le film
-        $film->delete();
+            $film->actors()->detach();
 
-        return redirect()->route('film.index')
-            ->with('success', __('Le film a été supprimé'));
+            if ($film->image_path) {
+                Storage::delete($film->image_path);
+            }
+
+            $film->delete();
+
+            DB::commit();
+
+            return redirect()->route('film.index')
+                ->with('success', __('Le film a été supprimé avec succès'));
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return redirect()->back()
+                ->with('error', __('Une erreur est survenue lors de la suppression du film'));
+        }
     }
 }

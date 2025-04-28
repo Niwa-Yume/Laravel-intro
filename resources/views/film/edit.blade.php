@@ -9,7 +9,7 @@
         <div class="p-6">
             <form method="POST"
                   action="{{ route('film.update', $film->id) }}"
-                  class="space-y-6">
+                  class="space-y-6" enctype="multipart/form-data">
                 @csrf
                 @method('PUT')
 
@@ -55,6 +55,14 @@
                                 </option>
                             @endforeach
                         </select>
+                    </div>
+                    <div>
+                        <label for="image" class="block text-sm font-medium text-gray-700">Image</label>
+                        <input type="file"
+                               name="image"
+                               id="image"
+                               accept="image/*"
+                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                     </div>
 
                     <div>
@@ -172,38 +180,33 @@
                 addDeleteListeners();
             });
 
-            // Gestion de la suppression du film
-            // Gestion de la suppression du film
-            document.addEventListener('DOMContentLoaded', function() {
-                const deleteBtn = document.querySelector('.delete-btn');
-                if (deleteBtn) {
-                    deleteBtn.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        if (confirm('{{ __("Êtes-vous sûr de vouloir supprimer ce film ?") }}')) {
-                            const id = this.dataset.id;
-                            const form = document.createElement('form');
-                            form.method = 'POST';
-                            form.action = `/film/${id}`;
+            const deleteBtn = document.querySelector('.delete-btn');
+            if (deleteBtn) {
+                deleteBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    if (confirm('{{ __("Êtes-vous sûr de vouloir supprimer ce film ?") }}')) {
+                        const id = this.dataset.id;
+                        const form = document.createElement('form');
+                        form.method = 'POST';
+                        form.action = `{{ url('film') }}/${id}`;
 
-                            const methodInput = document.createElement('input');
-                            methodInput.type = 'hidden';
-                            methodInput.name = '_method';
-                            methodInput.value = 'DELETE';
+                        const methodInput = document.createElement('input');
+                        methodInput.type = 'hidden';
+                        methodInput.name = '_method';
+                        methodInput.value = 'DELETE';
 
-                            const tokenInput = document.createElement('input');
-                            tokenInput.type = 'hidden';
-                            tokenInput.name = '_token';
-                            tokenInput.value = '{{ csrf_token() }}';
+                        const tokenInput = document.createElement('input');
+                        tokenInput.type = 'hidden';
+                        tokenInput.name = '_token';
+                        tokenInput.value = '{{ csrf_token() }}';
 
-                            form.appendChild(methodInput);
-                            form.appendChild(tokenInput);
-                            document.body.appendChild(form);
-
-                            form.submit(); // Supprimer l'event listener et soumettre directement
-                        }
-                    });
-                }
-            });
+                        form.appendChild(methodInput);
+                        form.appendChild(tokenInput);
+                        document.body.appendChild(form);
+                        form.submit();
+                    }
+                });
+            }
         </script>
     @endpush
 </x-app-layout>

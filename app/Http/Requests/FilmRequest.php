@@ -25,7 +25,8 @@ class FilmRequest extends FormRequest
             'director_id' => 'required|exists:artists,id',
             'country_id' => 'required|exists:countries,id',
             'actors' => 'sometimes|array',
-            'actors.*' => 'exists:artists,id'
+            'actors.*' => 'exists:artists,id',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
         ];
     }
 }

@@ -24,11 +24,6 @@ class Movie extends Model
             ->withPivot('role_name');
     }
 
-    public function allArtists()
-    {
-        return $this->belongsToMany(Artist::class, 'artist_movie', 'movie_id', 'artist_id')
-            ->withPivot('role_name');
-    }
 
 
 }

@@ -15,9 +15,17 @@ class DatabaseSeeder extends Seeder
     {
         // User::factory(10)->create();
 
-        User::factory()->create([
+        /*User::factory()->create([
             'name' => 'Test User',
             'email' => 'test@example.com',
+        ]);*/
+
+        // Appel des seeders personnalisés
+        $this->call([
+            CountrySeeder::class,
+            ExistingArtistSeeder::class, //les artistes de base
+            ExistingMovieSeeder::class, //les films de base
+            CinemaSeeder::class, //les cinémas de base
         ]);
     }
 }

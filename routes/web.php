@@ -4,6 +4,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ArtistController;
 use App\Http\Controllers\FilmController;
 use App\Http\Controllers\CountryController;
+use App\Http\Controllers\CinemaController;
+
 
 Route::get('/', function () {
     return view('welcome');
@@ -42,7 +44,8 @@ Route::middleware([
     Route::post('artist/{artist}/add-movie', [ArtistController::class, 'storeMovie'])
         ->name('artist.store-movie');
 
-
+    //Route pour le cinema
+    Route::resource('cinema', CinemaController::class);
 });
 
 

@@ -10,8 +10,8 @@
                     {{ __('Films') }}
                 </x-nav-link>
 
-                <x-nav-link href="{{ route('country.index') }}" :active="request()->routeIs('country.index')">
-                    {{ __('Pays') }}
+                <x-nav-link href="{{ route('cinema.index') }}" :active="request()->routeIs('country.index')">
+                    {{ __('Cinema') }}
                 </x-nav-link>
             </div>
         </div>

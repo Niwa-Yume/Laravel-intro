@@ -66,19 +66,8 @@
                 </div>
             </div>
 
-            <!-- Boutons d'action -->
-            <div class="flex justify-between pt-6 border-t border-gray-200">
-                <form action="{{ route('room.destroy', $room->id) }}" method="POST" class="inline" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette salle?');">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit" class="inline-flex items-center px-4 py-2 bg-red-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition duration-300 ease-in-out">
-                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                        </svg>
-                        Supprimer
-                    </button>
-                </form>
-
+            <!-- Boutons d'action pour la modification uniquement -->
+            <div class="flex justify-end pt-6 border-t border-gray-200">
                 <div class="flex space-x-3">
                     <a href="{{ route('cinema.edit', $room->cinema_id) }}" class="inline-flex items-center px-4 py-2 bg-gray-200 border border-transparent rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition duration-300 ease-in-out">
                         Annuler
@@ -92,6 +81,20 @@
                 </div>
             </div>
         </form>
+
+        <!-- Formulaire de suppression séparé -->
+        <div class="mt-4 border-t border-gray-200 pt-4">
+            <form action="{{ route('room.destroy', $room->id) }}" method="POST" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette salle?');">
+                @csrf
+                @method('DELETE')
+                <button type="submit" class="inline-flex items-center px-4 py-2 bg-red-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition duration-300 ease-in-out">
+                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                    </svg>
+                    Supprimer cette salle
+                </button>
+            </form>
+        </div>
     </div>
 
     @push('scripts')

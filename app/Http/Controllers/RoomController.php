@@ -8,6 +8,11 @@ use Illuminate\Http\Request;
 
 class RoomController extends Controller
 {
+    public function index()
+    {
+        $rooms = Room::with('cinema')->get();
+        return view('room.index', compact('rooms'));
+    }
     public function create(Request $request)
     {
         $cinema_id = $request->query('cinema_id');

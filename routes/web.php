@@ -47,6 +47,7 @@ Route::middleware([
     //Route pour le cinema
     Route::resource('cinema', CinemaController::class);
 
+    Route::get('/room', [App\Http\Controllers\RoomController::class, 'index'])->name('room.index');
     Route::get('/room/create', [App\Http\Controllers\RoomController::class, 'create'])->name('room.create');
     Route::post('/room', [App\Http\Controllers\RoomController::class, 'store'])->name('room.store');
     Route::get('/room/{room}/edit', [App\Http\Controllers\RoomController::class, 'edit'])->name('room.edit');

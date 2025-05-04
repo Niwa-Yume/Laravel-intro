@@ -24,12 +24,14 @@
                     </svg>
                     Retour à la liste
                 </a>
-                <a href="{{ route('cinema.edit', $cinema->id) }}" class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition duration-300 ease-in-out">
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                    </svg>
-                    Modifier
-                </a>
+                @can('update', $cinema)
+                    <a href="{{ route('cinema.edit', $cinema->id) }}" class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition duration-300 ease-in-out">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                        </svg>
+                        Modifier
+                    </a>
+                @endcan
             </div>
         </div>
         <svg class="absolute bottom-0 w-full h-8 text-gray-100" viewBox="0 0 1440 48">
@@ -57,39 +59,36 @@
         @else
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 @foreach($cinema->rooms as $room)
-                    <div class="bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200">
-                        <div class="p-4 border-b">
-                            <div class="flex justify-between items-center">
-                                <h3 class="text-lg font-bold text-gray-900">{{ $room->name }}</h3>
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full bg-green-100 text-green-800 text-sm font-medium">
-                                    {{ $room->capacity }} places
-                                </span>
-                            </div>
-                        </div>
+                    <div class="mb-4">
+                        <h3>{{ $room->name }}</h3>
 
-                        <div class="p-4">
-                            <h4 class="text-sm font-medium text-gray-700 mb-2">Prochaines séances</h4>
-                            @if($room->showtimes->isEmpty())
-                                <p class="text-sm text-gray-500 italic">Aucune séance programmée</p>
-                            @else
-                                <div class="space-y-2">
-                                    @foreach($room->showtimes->take(3) as $showtime)
-                                        <div class="flex items-center justify-between bg-gray-50 p-2 rounded-lg">
-                                            <div class="text-sm">
-                                                <div class="font-medium text-gray-900">{{ $showtime->movie->title }}</div>
-                                                <div class="text-gray-500">{{ date('d/m/Y H:i', strtotime($showtime->start_time)) }}</div>
-                                            </div>
-                                        </div>
-                                    @endforeach
+                        @foreach($room->showtimes as $showtime)
+                            <div class="ml-4 mb-2">
+                                <p>{{ $showtime->movie->title }} - {{ date('d/m/Y H:i', strtotime($showtime->start_time)) }}</p>
+
+                                <!-- Boutons d'action -->
+                                <div class="flex space-x-2">
+                                    @can('update', $showtime)
+                                        <a href="{{ route('showtime.edit', $showtime->id) }}" class="...">
+                                            Modifier
+                                        </a>
+                                    @endcan
+
+                                        @can('delete', $cinema)
+                                            <form action="{{ route('cinema.destroy', $cinema->id) }}" method="POST" class="inline">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="inline-flex items-center px-4 py-2 bg-red-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all duration-300">
+                                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                                    </svg>
+                                                    Supprimer
+                                                </button>
+                                            </form>
+                                        @endcan
                                 </div>
-                            @endif
-                        </div>
-
-                        <div class="p-4 bg-gray-50 flex justify-end">
-                            <a href="{{ route('room.edit', $room->id) }}" class="text-indigo-600 hover:text-indigo-800 text-sm font-medium">
-                                Modifier cette salle
-                            </a>
-                        </div>
+                            </div>
+                        @endforeach
                     </div>
                 @endforeach
             </div>

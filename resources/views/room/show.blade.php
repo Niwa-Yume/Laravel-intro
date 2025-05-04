@@ -23,12 +23,14 @@
                     </svg>
                     Retour à la liste
                 </a>
-                <a href="{{ route('room.edit', $room->id) }}" class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition duration-300 ease-in-out">
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                    </svg>
-                    Modifier
-                </a>
+                @can('update', $room)
+                    <a href="{{ route('room.edit', $room->id) }}" class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition duration-300 ease-in-out">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                        </svg>
+                        Modifier
+                    </a>
+                @endcan
             </div>
         </div>
         <svg class="absolute bottom-0 w-full h-8 text-gray-100" viewBox="0 0 1440 48">
@@ -92,22 +94,24 @@
                 @else
                     <div class="grid gap-4">
                         @foreach($upcomingShowtimes as $showtime)
-                            <div class="bg-white rounded-lg shadow-sm p-4 border-l-4 border-green-500 hover:shadow-md transition-shadow">
-                                <div class="flex justify-between items-center">
-                                    <div>
-                                        <h3 class="font-bold text-gray-900">{{ $showtime->movie->title }}</h3>
-                                        <p class="text-gray-600 flex items-center">
-                                            <svg class="w-4 h-4 mr-1 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                            </svg>
-                                            {{ date('d/m/Y à H:i', strtotime($showtime->start_time)) }}
-                                        </p>
-                                    </div>
-                                    <div class="text-right">
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full bg-green-100 text-green-800 text-sm font-medium">
-                                            À venir
-                                        </span>
-                                    </div>
+                            <div class="mb-4 p-4 border rounded-lg">
+                                <h3>{{ $showtime->movie->title }} - {{ date('d/m/Y H:i', strtotime($showtime->start_time)) }}</h3>
+
+                                <!-- Boutons d'action -->
+                                <div class="mt-2 flex space-x-2">
+                                    @can('update', $showtime)
+                                        <a href="{{ route('showtime.edit', $showtime->id) }}" class="...">
+                                            Modifier
+                                        </a>
+                                    @endcan
+
+                                    @can('delete', $showtime)
+                                        <form action="{{ route('showtime.destroy', $showtime->id) }}" method="POST">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="...">Supprimer</button>
+                                        </form>
+                                    @endcan
                                 </div>
                             </div>
                         @endforeach

@@ -2,19 +2,38 @@
 
 namespace App\Providers;
 
+use App\Models\Movie;
+use App\Models\Artist;
+use App\Models\Cinema;
+use App\Models\Room;
 use App\Models\Showtime;
+use App\Policies\CinemaPolicy;
+use App\Policies\RoomPolicy;
 use App\Policies\ShowtimePolicy;
+use App\Policies\MoviePolicy;
+use App\Policies\ArtistPolicy;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
-use Illuminate\Support\Facades\Gate;
 
 class AuthServiceProvider extends ServiceProvider
 {
+    /**
+     * The model to policy mappings for the application.
+     *
+     * @var array<class-string, class-string>
+     */
     protected $policies = [
-        \App\Models\Showtime::class => \App\Policies\ShowtimePolicy::class,
+        Room::class => RoomPolicy::class,
+        Showtime::class => ShowtimePolicy::class,
+        Artist::class => ArtistPolicy::class,
+        Movie::class => MoviePolicy::class,
+        Cinema::class => CinemaPolicy::class,
     ];
 
-    public function boot()
+    /**
+     * Register any authentication / authorization services.
+     */
+    public function boot(): void
     {
-        $this->registerPolicies();
+        // Vous pouvez laisser cette méthode vide ou y ajouter d'autres configurations d'autorisation
     }
 }

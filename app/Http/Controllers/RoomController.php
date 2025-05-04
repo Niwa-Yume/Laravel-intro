@@ -3,68 +3,55 @@
 namespace App\Http\Controllers;
 
 use App\Models\Room;
-use App\Models\Cinema;
 use Illuminate\Http\Request;
 
 class RoomController extends Controller
 {
+
+
+
+    // 1) Lister
     public function index()
     {
         $rooms = Room::with('cinema')->get();
         return view('room.index', compact('rooms'));
     }
-    public function create(Request $request)
+
+    // 2) Formulaire de création
+    public function create()
     {
-        $cinema_id = $request->query('cinema_id');
-        $cinema = null;
-
-        if ($cinema_id) {
-            $cinema = Cinema::findOrFail($cinema_id);
-        }
-
-        return view('room.create', compact('cinema'));
+        return view('room.create');
     }
 
+    // 3) Enregistrer
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'capacity' => 'required|integer|min:1',
+            'name'      => 'required|string|max:255',
+            'capacity'  => 'required|integer|min:1',
             'cinema_id' => 'required|exists:cinemas,id',
         ]);
 
+        // 🔑  Associer la salle au créateur
+        $validated['user_id'] = $request->user()->id;
+
         Room::create($validated);
 
-        return redirect()->route('cinema.edit', $validated['cinema_id'])
-            ->with('success', 'La salle a été créée avec succès');
+        return redirect()
+            ->route('room.index')
+            ->with('success', 'Salle créée avec succès !');
     }
 
-    public function edit(Room $room)
-    {
-        return view('room.edit', compact('room'));
-    }
-
-    public function update(Request $request, Room $room)
-    {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'capacity' => 'required|integer|min:1',
-        ]);
-
-        $room->update($validated);
-
-        return redirect()->route('cinema.edit', $room->cinema_id)
-            ->with('success', 'La salle a été modifiée avec succès');
-    }
+    // 4) Afficher
     public function show(Room $room)
     {
         // Récupérer les séances à venir (date future)
         $upcomingShowtimes = $room->showtimes()
             ->where('start_time', '>=', now())
-            ->orderBy('start_time', 'asc')
+            ->orderBy('start_time')
             ->get();
 
-        // Récupérer les séances passées
+        // Récupérer les séances passées (date passée)
         $pastShowtimes = $room->showtimes()
             ->where('start_time', '<', now())
             ->orderBy('start_time', 'desc')
@@ -72,13 +59,39 @@ class RoomController extends Controller
 
         return view('room.show', compact('room', 'upcomingShowtimes', 'pastShowtimes'));
     }
+
+    // 5) Formulaire d’édition
+    public function edit(Room $room)
+    {
+        return view('room.edit', compact('room'));
+    }
+
+    // 6) Mettre à jour
+    public function update(Request $request, Room $room)
+    {
+        $validated = $request->validate([
+            'name'      => 'required|string|max:255',
+            'capacity'  => 'required|integer|min:1',
+            'cinema_id' => 'required|exists:cinemas,id',
+        ]);
+
+        // (optionnel) changer de propriétaire
+        // $validated['user_id'] = $request->user()->id;
+
+        $room->update($validated);
+
+        return redirect()
+            ->route('room.show', $room)
+            ->with('success', 'Salle mise à jour !');
+    }
+
+    // 7) Supprimer
     public function destroy(Room $room)
     {
-        $cinema_id = $room->cinema_id;
-        $room->showtimes()->delete();
         $room->delete();
 
-        return redirect()->route('cinema.edit', $cinema_id)
-            ->with('success', 'La salle a été supprimée avec succès');
+        return redirect()
+            ->route('room.index')
+            ->with('success', 'Salle supprimée.');
     }
 }

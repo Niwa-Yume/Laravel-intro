@@ -5,8 +5,12 @@ use Illuminate\Database\Eloquent\Model;
 
 class Room extends Model
 {
-    protected $fillable = ['name', 'cinema_id', 'capacity'];
+    protected $fillable = ['name', 'cinema_id', 'capacity', 'user_id'];
 
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
     public function cinema()
     {
         return $this->belongsTo(Cinema::class);

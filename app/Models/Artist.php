@@ -13,8 +13,13 @@ class Artist extends Model
         'firstname',
         'country_id',
         'description',
-        'image_path'
+        'image_path',
+        'user_id',
     ];
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 
     public function country()
     {
@@ -31,5 +36,12 @@ class Artist extends Model
     public function directedMovies()
     {
         return $this->hasMany(Movie::class, 'director_id');
+    }
+
+    public function actors()
+    {
+        return $this->belongsToMany(Artist::class, 'artist_movie', 'movie_id', 'artist_id')
+            ->wherePivot('role_name', '!=', 'Directeur')
+            ->withPivot('role_name');
     }
 }

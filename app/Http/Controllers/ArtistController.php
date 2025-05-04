@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
 
+
 class ArtistController extends Controller
 {
     /**
@@ -45,6 +46,7 @@ class ArtistController extends Controller
      */
     public function store(Request $request)
     {
+        $this->authorize('create', Showtime::class);
         try {
             $validatedData = $request->validate([
                 'name' => 'required|string|max:255',
@@ -57,55 +59,20 @@ class ArtistController extends Controller
                 'movies.*.role_name' => 'required|string|max:255'
             ]);
 
-            if ($request->has('image')) {
-                try {
-                    $imageUrl = $request->input('image');
+            // Ajout du user_id dans les données validées
+            $validatedData['user_id'] = auth()->id();
 
-                    $context = stream_context_create([
-                        'http' => [
-                            'method' => 'GET',
-                            'header' => [
-                                'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-                            ]
-                        ]
-                    ]);
-
-                    $imageContents = @file_get_contents($imageUrl, false, $context);
-
-                    if ($imageContents === false) {
-                        throw new \Exception("Impossible de télécharger l'image depuis : " . $imageUrl);
-                    }
-
-                    if (!$this->isImage($imageContents)) {
-                        throw new \Exception("Le fichier téléchargé n'est pas une image valide");
-                    }
-
-                    $filename = 'artists/' . time() . '_' . uniqid() . '.jpg';
-                    $saved = Storage::disk('public')->put($filename, $imageContents);
-
-                    if (!$saved) {
-                        throw new \Exception("Échec de la sauvegarde de l'image");
-                    }
-
-                    \Log::info('Image sauvegardée dans : ' . $filename);
-                    $validatedData['image_path'] = $filename;
-
-                } catch (\Exception $e) {
-                    \Log::error('URL de l\'image : ' . $imageUrl);
-                    \Log::error('Chemin de sauvegarde : ' . storage_path('app/public/artists'));
-                    \Log::error('Erreur complète : ' . $e->getMessage());
-                    throw new \Exception("Erreur lors du traitement de l'image : " . $e->getMessage());
-                }
-            }
-
+            // Création de l'artiste avec toutes les données incluant user_id
             $artist = Artist::create([
                 'name' => $validatedData['name'],
                 'firstname' => $validatedData['firstname'],
                 'country_id' => $validatedData['country_id'],
-                'description' => $validatedData['description'],
-                'image_path' => $validatedData['image_path'] ?? null
+                'description' => $validatedData['description'] ?? null,
+                'image_path' => $validatedData['image'] ?? null,
+                'user_id' => $validatedData['user_id'] // Assurez-vous que user_id est inclus ici
             ]);
 
+            // Gestion des films associés
             if (isset($validatedData['movies'])) {
                 foreach ($validatedData['movies'] as $movie) {
                     $artist->movies()->attach($movie['movie_id'], [
@@ -116,12 +83,11 @@ class ArtistController extends Controller
 
             return redirect()->route('artist.index')
                 ->with('success', 'Artiste créé avec succès');
-
         } catch (\Exception $e) {
-            \Log::error('Erreur lors de la création de l\'artiste : ' . $e->getMessage());
+            \Log::error('Erreur création artiste: ' . $e->getMessage());
             return redirect()->back()
-                ->withInput()
-                ->with('error', "Une erreur est survenue : " . $e->getMessage());
+                ->with('error', 'Une erreur est survenue lors de la création de l\'artiste')
+                ->withInput();
         }
     }
 
@@ -143,7 +109,8 @@ class ArtistController extends Controller
         return view('artists.edit', [
             'artist' => $artist,
             'countries' => Country::all(),
-            'movies' => Movie::all()
+            'movies' => Movie::all(),
+
         ]);
     }
 
@@ -152,6 +119,7 @@ class ArtistController extends Controller
      */
     public function update(Request $request, Artist $artist)
     {
+        $this->authorize('update', $artist);
         $validatedData = $request->validate([
             'name' => 'required|string|max:255',
             'firstname' => 'required|string|max:255',
@@ -197,6 +165,7 @@ class ArtistController extends Controller
      */
     public function destroy(Artist $artist, Request $request)
     {
+        $this->authorize('delete', $artist);
         try {
             // Vérifiez d'abord les relations
             if ($artist->directedMovies()->count() > 0) {

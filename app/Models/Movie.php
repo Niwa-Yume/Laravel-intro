@@ -7,8 +7,13 @@ use Illuminate\Database\Eloquent\Model;
 class Movie extends Model
 {
     protected $fillable = [
-        'title', 'year', 'country_id', 'director_id', 'poster_url'
+        'title', 'year', 'country_id', 'director_id', 'poster_url', 'user_id'
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
     public function country()
     {
         return $this->belongsTo(Country::class);

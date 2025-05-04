@@ -35,16 +35,23 @@ class FilmController extends Controller
      */
     public function store(FilmRequest $request)
     {
+        $validatedData = $request->validated();
+        $validatedData['user_id'] = auth()->id(); // Ajout de l'ID utilisateur
+
+        // Créer le film
+        $film = Movie::create($validatedData);
+
+        // Gérer l'image si présente
         if ($request->hasFile('image')) {
             $path = $request->file('image')->store('films', 'public');
             $film->image_path = $path;
             $film->save();
         }
-        $film = Movie::create($request->validated());
-        $film->update($request->validated());
-        $film->actors()->attach($request->director_id, ['role_name' => 'Directeur']);
-        // Ajouter le directeur avec son rôle
-        $film->actors()->attach($request->director_id, ['role_name' => 'Directeur']);
+
+        // Ajouter le directeur
+        if ($request->director_id) {
+            $film->actors()->attach($request->director_id, ['role_name' => 'Directeur']);
+        }
 
         // Ajouter le casting
         if ($request->has('casting')) {

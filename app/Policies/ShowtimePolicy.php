@@ -26,10 +26,9 @@ class ShowtimePolicy
         return auth()->check(); // Utilisateur connecté uniquement
     }
 
-    public function update(User $user, Showtime $showtime)
+    public function update(User $user, Showtime $showtime): bool
     {
-
-        return $user->id === $showtime->user_id;
+        return $user->id === $showtime->user_id || $showtime->user_id === null;
     }
 
     public function delete(User $user, Showtime $showtime)

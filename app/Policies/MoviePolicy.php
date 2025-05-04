@@ -35,9 +35,15 @@ class MoviePolicy
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, Movie $movie): bool
+    public function update(User $user, Movie $film): bool
     {
-        return $user->id === $movie->user_id;
+        // Si le film n'a pas de propriétaire, autoriser tout utilisateur authentifié
+        if ($film->user_id === null) {
+            return true;
+        }
+
+        // Sinon vérifier si l'utilisateur est le propriétaire
+        return $user->id === $film->user_id;
     }
 
     /**

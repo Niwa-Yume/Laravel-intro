@@ -11,29 +11,42 @@ class ArtistPolicy
     /**
      * Determine whether the user can view any models.
      */
-    public function viewAny(?User $user)
+    public function viewAny(?User $user): bool
     {
-        return true; // Tout le monde peut voir la liste
+        return true; // Tout le monde peut voir la liste des artistes
     }
 
-    public function view(?User $user, Artist $artist)
+    /**
+     * Determine whether the user can view the model.
+     */
+    public function view(?User $user, Artist $artist): bool
     {
-        return true; // Tout le monde peut voir les détails
+        return true; // Tout le monde peut voir les détails d'un artiste
     }
 
-    public function create(User $user)
+    /**
+     * Determine whether the user can create models.
+     */
+    public function create(User $user): bool
     {
-        return auth()->check(); // Utilisateur connecté uniquement
+        return true; // Utilisateur connecté peut créer un artiste
     }
 
-    public function update(User $user, Artist $artist)
+    /**
+     * Determine whether the user can update the model.
+     */
+    public function update(User $user, Artist $artist): bool
     {
         return $user->id === $artist->user_id;
     }
 
-    public function delete(User $user, Artist $artist)
+    /**
+     * Determine whether the user can delete the model.
+     */
+    public function delete(User $user, Artist $artist): bool
     {
-        return $user->id === $artist->user_id;
+        // Vérifie si l'utilisateur est le propriétaire et si l'artiste n'a pas réalisé de films
+        return $user->id === $artist->user_id && $artist->directedMovies()->count() === 0;
     }
 
     /**

@@ -57,13 +57,13 @@ class CinemaController extends Controller
             ->with('success', 'Le cinéma a été modifié avec succès');
     }
 
-    public function show($id)
+    public function show(Cinema $cinema)
     {
-        $film = Movie::with('actors')->findOrFail($id);
-        $actors = $film->actors->take(3); // Prendre seulement les 3 premiers acteurs
+        $this->authorize('view', $cinema);
 
-        return view('film.show', compact('film', 'actors'));
+        return view('cinema.show', compact('cinema'));
     }
+
 
     public function destroy(Cinema $cinema)
     {

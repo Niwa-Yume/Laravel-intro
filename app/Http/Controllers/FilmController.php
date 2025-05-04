@@ -17,14 +17,22 @@ class FilmController extends Controller
      */
     public function index()
     {
+        // Récupérer tous les films avec leurs relations
+        $films = Movie::with(['country', 'director', 'actors'])->get();
+
+        // Vérifier si l'utilisateur est authentifié
+        $auth_id = auth()->id();
+
+        // Retourner la vue avec les films
         return view('film.index', [
-            'films' => Movie::with(['actors', 'country'])->get()
+            'films' => $films
         ]);
     }
 
     /**
      * Show the form for creating a new resource.
      */
+
     public function create()
     {
         return view('film.create');
@@ -33,39 +41,23 @@ class FilmController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(FilmRequest $request)
+    public function store(Request $request)
     {
-        $validatedData = $request->validated();
-        $validatedData['user_id'] = auth()->id(); // Ajout de l'ID utilisateur
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'year' => 'required|integer',
+            'country_id' => 'required|exists:countries,id',
+            'director_id' => 'required|exists:artists,id',
+            'poster_url' => 'nullable|url'
+        ]);
 
-        // Créer le film
-        $film = Movie::create($validatedData);
+        // Ajouter l'ID de l'utilisateur connecté
+        $validated['user_id'] = auth()->id();
 
-        // Gérer l'image si présente
-        if ($request->hasFile('image')) {
-            $path = $request->file('image')->store('films', 'public');
-            $film->image_path = $path;
-            $film->save();
-        }
-
-        // Ajouter le directeur
-        if ($request->director_id) {
-            $film->actors()->attach($request->director_id, ['role_name' => 'Directeur']);
-        }
-
-        // Ajouter le casting
-        if ($request->has('casting')) {
-            foreach ($request->casting as $castMember) {
-                if (!empty($castMember['actor_id'])) {
-                    $film->actors()->attach($castMember['actor_id'], [
-                        'role_name' => 'Acteur'
-                    ]);
-                }
-            }
-        }
+        Movie::create($validated);
 
         return redirect()->route('film.index')
-            ->with('success', __('Le film a été créé'));
+            ->with('success', 'Le film a été créé avec succès');
     }
 
     /**
@@ -73,7 +65,15 @@ class FilmController extends Controller
      */
     public function show(Movie $film)
     {
-        return view('film.show', compact('film'));
+        $this->authorize('view', $film);
+
+        // Charger les relations nécessaires
+        $film->load(['country', 'director', 'actors']);
+
+        // Récupérer l'artiste (réalisateur) associé
+        $artist = $film->director;
+
+        return view('film.show', compact('film', 'artist'));
     }
 
     /**
@@ -90,33 +90,15 @@ class FilmController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(FilmRequest $request, Movie $film)
+    public function update(User $user, Movie $film): bool
     {
-        $film->update($request->validated());
-
-        // Supprimer tous les acteurs existants
-        $film->actors()->detach();
-
-        $film->update($request->validated());
-        $film->actors()->attach($request->director_id, ['role_name' => 'Directeur']);
-
-        // Ajouter ou mettre à jour le casting
-        if ($request->has('casting')) {
-            foreach ($request->casting as $castMember) {
-                if (!empty($castMember['actor_id'])) {
-                    $film->actors()->attach($castMember['actor_id'], [
-                        'role_name' => 'Acteur'
-                    ]);
-                }
-            }
+        // Si le film n'a pas de user_id et que l'utilisateur est authentifié
+        if ($film->user_id === null && auth()->check()) {
+            return true;
         }
-        if ($request->hasFile('image')) {
-            $path = $request->file('image')->store('films', 'public');
-            $film->image_path = $path;
-            $film->save();
-        }
-        return redirect()->route('film.index')
-            ->with('success', __('Le film a été modifié'));
+
+        // Sinon vérifier si l'utilisateur est le propriétaire
+        return $user->id === $film->user_id;
     }
 
     /**

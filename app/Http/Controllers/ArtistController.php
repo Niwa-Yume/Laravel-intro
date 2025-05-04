@@ -46,7 +46,7 @@ class ArtistController extends Controller
      */
     public function store(Request $request)
     {
-        $this->authorize('create', Showtime::class);
+        $this->authorize('create', Artist::class);
         try {
             $validatedData = $request->validate([
                 'name' => 'required|string|max:255',
@@ -59,19 +59,19 @@ class ArtistController extends Controller
                 'movies.*.role_name' => 'required|string|max:255'
             ]);
 
-            // Ajout du user_id dans les données validées
-            $validatedData['user_id'] = auth()->id();
-
-            // Création de l'artiste avec toutes les données incluant user_id
+            // Ajout explicite du user_id
             $artist = Artist::create([
                 'name' => $validatedData['name'],
                 'firstname' => $validatedData['firstname'],
                 'country_id' => $validatedData['country_id'],
                 'description' => $validatedData['description'] ?? null,
                 'image_path' => $validatedData['image'] ?? null,
-                'user_id' => $validatedData['user_id'] // Assurez-vous que user_id est inclus ici
+                'user_id' => auth()->id() // Ajout de l'ID de l'utilisateur connecté
             ]);
 
+            $validatedData['user_id'] = auth()->id();
+
+            $artist = Artist::create($validatedData);
             // Gestion des films associés
             if (isset($validatedData['movies'])) {
                 foreach ($validatedData['movies'] as $movie) {
@@ -83,6 +83,7 @@ class ArtistController extends Controller
 
             return redirect()->route('artist.index')
                 ->with('success', 'Artiste créé avec succès');
+
         } catch (\Exception $e) {
             \Log::error('Erreur création artiste: ' . $e->getMessage());
             return redirect()->back()

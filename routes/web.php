@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ShowtimeController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ArtistController;
 use App\Http\Controllers\FilmController;
@@ -58,12 +59,7 @@ Route::middleware([
 
 
     // Routes pour les séances
-    Route::get('/showtime', [App\Http\Controllers\ShowtimeController::class, 'index'])->name('showtime.index');
-    Route::get('/showtime/create', [App\Http\Controllers\ShowtimeController::class, 'create'])->name('showtime.create');
-    Route::post('/showtime', [App\Http\Controllers\ShowtimeController::class, 'store'])->name('showtime.store');
-    Route::get('/showtime/{showtime}/edit', [App\Http\Controllers\ShowtimeController::class, 'edit'])->name('showtime.edit');
-    Route::put('/showtime/{showtime}', [App\Http\Controllers\ShowtimeController::class, 'update'])->name('showtime.update');
-    Route::delete('/showtime/{showtime}', [App\Http\Controllers\ShowtimeController::class, 'destroy'])->name('showtime.destroy');
+    Route::resource('showtime', ShowtimeController::class);
 });
 
 

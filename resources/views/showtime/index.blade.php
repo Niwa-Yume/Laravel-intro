@@ -9,15 +9,18 @@
                 Liste des séances
             </h1>
             <div class="flex gap-3">
-                <!-- Temporairement commenté jusqu'à ce que la route existe -->
-                <!--
+                <a href="{{ route('film.index') }}" class="text-black inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs uppercase tracking-widest hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-300 ease-in-out">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4v16M17 4v16M3 8h18M3 16h18"/>
+                    </svg>
+                    Liste des films
+                </a>
                 <a href="{{ route('showtime.create') }}" class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition duration-300 ease-in-out">
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                     </svg>
                     Ajouter une séance
                 </a>
-                -->
             </div>
         </div>
         <svg class="absolute bottom-0 w-full h-8 text-gray-100" viewBox="0 0 1440 48">
@@ -30,105 +33,116 @@
         <div class="flex flex-col sm:flex-row gap-4">
             <div class="relative flex-grow">
                 <input type="text" id="search-showtime" placeholder="Rechercher une séance..." class="w-full rounded-lg border border-gray-300 focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 pl-10">
-                <svg class="w-5 h-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                </svg>
             </div>
         </div>
     </div>
 
     <!-- Liste des séances -->
-    <div class="bg-white rounded-xl shadow-lg p-6">
-        @if($showtimes->isEmpty())
-            <div class="bg-gray-50 p-12 rounded-xl text-center">
-                <svg class="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        @forelse($showtimes as $showtime)
+            <div class="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border-l-4 border-purple-600 group showtime-card flex flex-col h-full"
+                 data-id="{{ $showtime->id }}"
+                 data-movie-title="{{ $showtime->movie->title }}"
+                 data-start-time="{{ $showtime->start_time }}">
+                <div class="p-6 flex flex-col h-full">
+                    <!-- En-tête avec nom du film -->
+                    <div class="flex justify-between items-start mb-3">
+                        <h3 class="text-xl font-bold text-gray-900 group-hover:text-indigo-600 transition-colors">{{ $showtime->movie->title }}</h3>
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full {{ strtotime($showtime->start_time) > time() ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' }} text-sm font-medium">
+                            {{ strtotime($showtime->start_time) > time() ? 'À venir' : 'Passée' }}
+                        </span>
+                    </div>
+
+                    <!-- Informations de la séance -->
+                    <div class="mb-4">
+                        <div class="flex items-center text-gray-700 mb-2">
+                            <svg class="w-4 h-4 mr-2 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            <span>{{ date('d/m/Y H:i', strtotime($showtime->start_time)) }}</span>
+                        </div>
+
+                        <div class="flex items-center text-gray-700 mb-2">
+                            <svg class="w-4 h-4 mr-2 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                            </svg>
+                            <span>Salle : <a href="{{ route('room.show', $showtime->room_id) }}" class="text-indigo-600 hover:text-indigo-800">{{ $showtime->room->name }}</a></span>
+                        </div>
+
+                        <div class="flex items-center text-gray-700">
+                            <svg class="w-4 h-4 mr-2 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                            </svg>
+                            <span>Cinéma : <a href="{{ route('cinema.show', $showtime->room->cinema_id) }}" class="text-indigo-600 hover:text-indigo-800">{{ $showtime->room->cinema->name }}</a></span>
+                        </div>
+                    </div>
+
+                    <!-- Boutons d'action -->
+                    <div class="mt-auto pt-4 border-t border-gray-100 flex justify-end space-x-3">
+                        <a href="{{ route('showtime.edit', $showtime->id) }}" class="inline-flex items-center px-3 py-1.5 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition duration-300 ease-in-out">
+                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                            </svg>
+                            Modifier
+                        </a>
+                        <a href="{{ route('film.show', $showtime->movie_id) }}" class="inline-flex items-center px-3 py-1.5 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-300 ease-in-out">
+                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                            </svg>
+                            Voir le film
+                        </a>
+                    </div>
+                </div>
+            </div>
+        @empty
+            <div class="col-span-3 bg-white p-8 rounded-xl shadow text-center">
+                <svg class="w-16 h-16 text-gray-200 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                 </svg>
-                <p class="text-gray-500 mb-4">Aucune séance n'a été programmée</p>
-                <!-- Temporairement commenté
+                <p class="text-gray-500 mb-4">Aucune séance trouvée</p>
                 <a href="{{ route('showtime.create') }}" class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition-colors">
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                     </svg>
                     Ajouter une séance
                 </a>
-                -->
             </div>
-        @else
-            <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-50">
-                    <tr>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Film</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Salle</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cinéma</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date et heure</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut</th>
-                        <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                    </tr>
-                    </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
-                    @foreach($showtimes as $showtime)
-                        <tr>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="flex items-center">
-                                    <div class="ml-4">
-                                        <div class="text-sm font-medium text-gray-900">{{ $showtime->movie->title }}</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm text-gray-900">{{ $showtime->room->name }}</div>
-                                <div class="text-sm text-gray-500">{{ $showtime->room->capacity }} places</div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm text-gray-900">{{ $showtime->room->cinema->name }}</div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm text-gray-900">{{ date('d/m/Y', strtotime($showtime->start_time)) }}</div>
-                                <div class="text-sm text-gray-500">{{ date('H:i', strtotime($showtime->start_time)) }}</div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                @if($showtime->start_time >= now())
-                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                                            À venir
-                                        </span>
-                                @else
-                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
-                                            Passée
-                                        </span>
-                                @endif
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                <!-- Remplacer par le lien vers la salle uniquement -->
-                                <a href="{{ route('room.show', $showtime->room_id) }}" class="text-blue-600 hover:text-blue-900">Voir la salle</a>
-                            </td>
-                        </tr>
-                    @endforeach
-                    </tbody>
-                </table>
-            </div>
-        @endif
+        @endforelse
     </div>
 
     @push('scripts')
         <script>
             document.addEventListener('DOMContentLoaded', function() {
                 const searchInput = document.getElementById('search-showtime');
-                const rows = document.querySelectorAll('tbody tr');
+                const showtimeCards = document.querySelectorAll('.showtime-card');
 
-                // Fonction pour filtrer les séances
+                // Fonction pour filtrer les cartes
                 function filterShowtimes() {
                     const searchValue = searchInput.value.toLowerCase();
 
-                    rows.forEach(row => {
-                        const cardText = row.textContent.toLowerCase();
-                        row.style.display = cardText.includes(searchValue) ? '' : 'none';
+                    showtimeCards.forEach(card => {
+                        const cardText = card.textContent.toLowerCase();
+                        const matchesSearch = cardText.includes(searchValue);
+                        card.style.display = matchesSearch ? 'flex' : 'none';
                     });
                 }
 
                 // Événements
                 searchInput.addEventListener('input', filterShowtimes);
+
+                // Rendre les cartes cliquables
+                showtimeCards.forEach(card => {
+                    card.style.cursor = 'pointer';
+                    card.addEventListener('click', function(e) {
+                        // Ne pas déclencher si on clique sur un lien ou un bouton
+                        if (e.target.closest('a') || e.target.closest('button') || e.target.closest('form')) {
+                            return;
+                        }
+                        const showtimeId = this.getAttribute('data-id');
+                        window.location.href = '{{ route("showtime.show", "") }}/' + showtimeId;
+                    });
+                });
             });
         </script>
 

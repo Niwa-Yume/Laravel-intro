@@ -30,6 +30,10 @@ class User extends Authenticatable
         'email',
         'password',
     ];
+    public function showtimes()
+    {
+        return $this->hasMany(Showtime::class);
+    }
 
     /**
      * The attributes that should be hidden for serialization.

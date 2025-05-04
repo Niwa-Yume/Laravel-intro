@@ -59,7 +59,18 @@ Route::middleware([
 
 
     // Routes pour les séances
-    Route::resource('showtime', ShowtimeController::class);
+    // Routes accessibles à tous
+    Route::get('/showtimes', [ShowtimeController::class, 'index'])->name('showtime.index');
+    Route::get('/showtime/{showtime}', [ShowtimeController::class, 'show'])->name('showtime.show');
+
+    // Routes protégées
+    Route::middleware('auth')->group(function () {
+        Route::get('/showtime/create', [ShowtimeController::class, 'create'])->name('showtime.create');
+        Route::post('/showtimes', [ShowtimeController::class, 'store'])->name('showtime.store');
+        Route::get('/showtime/{showtime}/edit', [ShowtimeController::class, 'edit'])->name('showtime.edit');
+        Route::put('/showtime/{showtime}', [ShowtimeController::class, 'update'])->name('showtime.update');
+        Route::delete('/showtime/{showtime}', [ShowtimeController::class, 'destroy'])->name('showtime.destroy');
+    });
 });
 
 

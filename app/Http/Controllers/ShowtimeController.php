@@ -6,6 +6,7 @@ use App\Models\Showtime;
 use App\Models\Movie;
 use App\Models\Room;
 use Illuminate\Http\Request;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class ShowtimeController extends Controller
 {
@@ -27,11 +28,15 @@ class ShowtimeController extends Controller
 
     public function store(Request $request)
     {
+        $this->authorize('create', Showtime::class);
+
         $validated = $request->validate([
             'movie_id' => 'required|exists:movies,id',
             'room_id' => 'required|exists:rooms,id',
             'start_time' => 'required|date|after:now',
         ]);
+
+        $validated['user_id'] = auth()->id();
 
         Showtime::create($validated);
 
@@ -48,6 +53,8 @@ class ShowtimeController extends Controller
 
     public function update(Request $request, Showtime $showtime)
     {
+        $this->authorize('update', $showtime);
+
         $validated = $request->validate([
             'movie_id' => 'required|exists:movies,id',
             'room_id' => 'required|exists:rooms,id',
@@ -67,6 +74,7 @@ class ShowtimeController extends Controller
 
     public function destroy(Showtime $showtime)
     {
+        $this->authorize('delete', $showtime);
         $showtime->delete();
 
         return redirect()->route('showtime.index')

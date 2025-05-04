@@ -6,7 +6,7 @@
         <div class="absolute inset-0 opacity-15 bg-comic-pattern"></div>
         <div class="px-6 flex flex-col md:flex-row justify-between items-center relative z-10">
             <h1 class="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-red-600 mb-4 md:mb-0 drop-shadow-md marvel-effect">
-                Ajouter une nouvelle séance
+                Créer une nouvelle séance
             </h1>
             <a href="{{ route('showtime.index') }}" class="inline-flex items-center px-4 py-2 bg-gray-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition duration-300 ease-in-out">
                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">

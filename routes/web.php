@@ -47,12 +47,23 @@ Route::middleware([
     //Route pour le cinema
     Route::resource('cinema', CinemaController::class);
 
+    //route pour les salles
     Route::get('/room', [App\Http\Controllers\RoomController::class, 'index'])->name('room.index');
     Route::get('/room/create', [App\Http\Controllers\RoomController::class, 'create'])->name('room.create');
     Route::post('/room', [App\Http\Controllers\RoomController::class, 'store'])->name('room.store');
     Route::get('/room/{room}/edit', [App\Http\Controllers\RoomController::class, 'edit'])->name('room.edit');
     Route::put('/room/{room}', [App\Http\Controllers\RoomController::class, 'update'])->name('room.update');
+    Route::get('/room/{room}', [App\Http\Controllers\RoomController::class, 'show'])->name('room.show');
     Route::delete('/room/{room}', [App\Http\Controllers\RoomController::class, 'destroy'])->name('room.destroy');
+
+
+    // Routes pour les séances
+    Route::get('/showtime', [App\Http\Controllers\ShowtimeController::class, 'index'])->name('showtime.index');
+    Route::get('/showtime/create', [App\Http\Controllers\ShowtimeController::class, 'create'])->name('showtime.create');
+    Route::post('/showtime', [App\Http\Controllers\ShowtimeController::class, 'store'])->name('showtime.store');
+    Route::get('/showtime/{showtime}/edit', [App\Http\Controllers\ShowtimeController::class, 'edit'])->name('showtime.edit');
+    Route::put('/showtime/{showtime}', [App\Http\Controllers\ShowtimeController::class, 'update'])->name('showtime.update');
+    Route::delete('/showtime/{showtime}', [App\Http\Controllers\ShowtimeController::class, 'destroy'])->name('showtime.destroy');
 });
 
 

@@ -56,7 +56,22 @@ class RoomController extends Controller
         return redirect()->route('cinema.edit', $room->cinema_id)
             ->with('success', 'La salle a été modifiée avec succès');
     }
+    public function show(Room $room)
+    {
+        // Récupérer les séances à venir (date future)
+        $upcomingShowtimes = $room->showtimes()
+            ->where('start_time', '>=', now())
+            ->orderBy('start_time', 'asc')
+            ->get();
 
+        // Récupérer les séances passées
+        $pastShowtimes = $room->showtimes()
+            ->where('start_time', '<', now())
+            ->orderBy('start_time', 'desc')
+            ->get();
+
+        return view('room.show', compact('room', 'upcomingShowtimes', 'pastShowtimes'));
+    }
     public function destroy(Room $room)
     {
         $cinema_id = $room->cinema_id;

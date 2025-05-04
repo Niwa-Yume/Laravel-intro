@@ -43,6 +43,9 @@
             <div class="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border-l-4 border-indigo-600 group room-card flex flex-col h-full"
                  data-id="{{ $room->id }}"
                  data-name="{{ $room->name }}">
+
+
+
                 <div class="p-6 flex flex-col h-full">
                     <!-- En-tête avec nom -->
                     <div class="flex justify-between items-start mb-3">
@@ -106,6 +109,7 @@
                     </div>
                 </div>
             </div>
+            </a>
         @empty
             <div class="col-span-3 bg-white p-8 rounded-xl shadow text-center">
                 <svg class="w-16 h-16 text-gray-200 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -151,7 +155,7 @@
                             return;
                         }
                         const roomId = this.getAttribute('data-id');
-                        window.location.href = '{{ route("room.edit", "") }}/' + roomId;
+                        window.location.href = '{{ route("room.show", "") }}/' + roomId;
                     });
                 });
             });

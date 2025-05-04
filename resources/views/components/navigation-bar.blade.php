@@ -17,6 +17,9 @@
                 <x-nav-link href="{{ route('room.index') }}" :active="request()->routeIs('room.index')">
                     {{ __('Salles') }}
                 </x-nav-link>
+                <x-nav-link href="{{ route('showtime.index') }}" :active="request()->routeIs('showtime.index')">
+                    {{ __('Séances') }}
+                </x-nav-link>
             </div>
         </div>
     </div>
